@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
-from routes import clienteRouter, productoRouter, ventaRouter
+from routes import clienteRouter, productoRouter, ventaRouter, marcaRouter
 
 load_dotenv() 
 
