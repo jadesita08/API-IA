@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
-from managers.marcasManager import MarcasManager
+from ..managers.marcasManager import MarcasManager
 from models.marcaModel import Marca 
 
 router = APIRouter()
