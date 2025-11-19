@@ -1,58 +1,57 @@
 import psycopg
 from managers.conexionManager import ConexionManager
-from models.clienteModel import Cliente 
+from models.marcaModel import Marca 
 
-class ClientesManager:
+class MarcasManager:
     def __init__(self):
         self.conn_manager = ConexionManager()
     
-    def crear_cliente(self, cliente: Cliente):
-        """Crea un nuevo cliente."""
+    def crear_marca(self, marca: Marca):
+        """Crea una nueva marca."""
         try:
             conn = self.conn_manager.get_connection()
             if conn is None: return None
             
             cursor = conn.cursor()
             cursor.execute(
-                "INSERT INTO clientes (nombre, email, telefono) VALUES (%s, %s, %s) RETURNING id",
-                (cliente.nombre, cliente.email, cliente.telefono)
+                "INSERT INTO marcas (nombre, pais) VALUES (%s, %s) RETURNING id",
+                (marca.nombre, marca.pais)
             )
-            cliente_id = cursor.fetchone()[0]
+            marca_id = cursor.fetchone()[0]
             conn.commit()
             cursor.close()
             conn.close()
-            return cliente_id
+            return marca_id
         except psycopg.Error:
             return None
     
-    def obtener_clientes(self):
-        """Obtiene la lista de clientes."""
+    def obtener_marcas(self):
+        """Obtiene todas las marcas."""
         try:
             conn = self.conn_manager.get_connection()
             if conn is None: return []
 
             cursor = conn.cursor()
-            cursor.execute("SELECT id, nombre, email, telefono FROM clientes")
+            cursor.execute("SELECT id, nombre, pais FROM marcas")
             
             column_names = [desc[0] for desc in cursor.description]
-            clientes = [dict(zip(column_names, row)) for row in cursor.fetchall()]
+            marcas = [dict(zip(column_names, row)) for row in cursor.fetchall()]
                 
             cursor.close()
             conn.close()
-            return clientes
+            return marcas
         except psycopg.Error:
             return []
     
-    def actualizar_cliente(self, cliente_id: int, cliente: Cliente):
-        """Actualiza un cliente existente."""
+    def actualizar_marca(self, marca_id: int, marca: Marca):
+        """Actualiza una marca existente."""
         try:
             conn = self.conn_manager.get_connection()
             if conn is None: return False
-            
             cursor = conn.cursor()
             cursor.execute(
-                "UPDATE clientes SET nombre = %s, email = %s, telefono = %s WHERE id = %s",
-                (cliente.nombre, cliente.email, cliente.telefono, cliente_id)
+                "UPDATE marcas SET nombre = %s, pais = %s WHERE id = %s",
+                (marca.nombre, marca.pais, marca_id)
             )
             updated_rows = cursor.rowcount
             conn.commit()
@@ -61,15 +60,14 @@ class ClientesManager:
             return updated_rows > 0
         except psycopg.Error:
             return False
-    
-    def eliminar_cliente(self, cliente_id: int):
-        """Elimina un cliente."""
+
+    def eliminar_marca(self, marca_id: int):
+        """Elimina una marca."""
         try:
             conn = self.conn_manager.get_connection()
             if conn is None: return False
-            
             cursor = conn.cursor()
-            cursor.execute("DELETE FROM clientes WHERE id = %s", (cliente_id,))
+            cursor.execute("DELETE FROM marcas WHERE id = %s", (marca_id,))
             deleted_rows = cursor.rowcount
             conn.commit()
             cursor.close()
