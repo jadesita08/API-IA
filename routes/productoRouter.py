@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
-from managers.productosManager import ProductosManager
+from ..managers.productosManager import ProductosManager
 from models.productoModel import Producto 
-from ia.recomendacionManager import RecomendacionManager
+
 
 router = APIRouter()
 manager = ProductosManager()
