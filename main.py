@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
 
+
 from routes.clienteRouter import router as clienteRouter
 from routes.productoRouter import router as productoRouter
 from routes.ventaRouter import router as ventaRouter
