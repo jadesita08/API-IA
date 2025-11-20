@@ -2,10 +2,8 @@ from fastapi import APIRouter, HTTPException, status
 from managers.productosManager import ProductosManager
 from models.productoModel import Producto 
 
-
 router = APIRouter()
 manager = ProductosManager()
-ia_manager = RecomendacionManager()
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 def crear_producto(producto: Producto):
@@ -46,12 +44,3 @@ def eliminar_producto(producto_id: int):
         return
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al eliminar producto: {e}")
-
-@router.get("/recomendacion/{cliente_id}", tags=["IA"])
-def obtener_recomendacion_ia(cliente_id: int):
-    """Obtiene recomendaciones de IA para un cliente."""
-    try:
-        recomendaciones = ia_manager.obtener_recomendacion(cliente_id)
-        return recomendaciones
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al obtener recomendación de IA: {e}")
