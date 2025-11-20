@@ -1,6 +1,10 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
-from routes import clienteRouter, productoRouter, ventaRouter, marcaRouter
+
+from routes.clienteRouter import router as clienteRouter
+from routes.productoRouter import router as productoRouter
+from routes.ventaRouter import router as ventaRouter
+from routes.marcaRouter import router as marcaRouter
 
 load_dotenv() 
 
@@ -9,9 +13,10 @@ app = FastAPI(
     version="1.0.0"
 )
 
-app.include_router(clienteRouter.router, prefix="/clientes", tags=["Clientes"])
-app.include_router(productoRouter.router, prefix="/productos", tags=["Productos"])
-app.include_router(ventaRouter.router, prefix="/ventas", tags=["Ventas"])
+app.include_router(clienteRouter, prefix="/clientes", tags=["Clientes"])
+app.include_router(productoRouter, prefix="/productos", tags=["Productos"])
+app.include_router(ventaRouter, prefix="/ventas", tags=["Ventas"])
+app.include_router(marcaRouter, prefix="/marcas", tags=["Marcas"])
 
 @app.get("/", tags=["Root"])
 def read_root():
