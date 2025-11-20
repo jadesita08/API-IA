@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
-from ..managers.ventasManager import VentasManager
+from managers.ventasManager import VentasManager
 from models.ventaModel import Venta 
 
 router = APIRouter()
