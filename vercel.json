@@ -1,4 +1,5 @@
- "builds": [
+ vercel.json   {
+  "builds": [
     {
       "src": "main.py",
       "use": "@vercel/python"
@@ -10,6 +11,4 @@
       "dest": "main.py"
     }
   ]
-
-
-
+}
