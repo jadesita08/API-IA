@@ -1,26 +1,85 @@
+import psycopg
 from managers.conexionManager import ConexionManager
-from models.ventaModel import VentaModel
+from models.ventaModel import Venta 
 
 class VentasManager:
-    @staticmethod
-    def listar_ventas():
-        conn = ConexionManager.obtener_conexion()
-        cur = conn.cursor()
-        cur.execute("SELECT id, cliente_id, producto_id, cantidad FROM ventas")
-        rows = cur.fetchall()
-        cur.close()
-        conn.close()
-        return [{"id": r[0], "cliente_id": r[1], "producto_id": r[2], "cantidad": r[3]} for r in rows]
+    def __init__(self):
+        self.conn_manager = ConexionManager()
+    
+    def crear_venta(self, venta: Venta):
+        """Crea una nueva venta."""
+        try:
+            conn = self.conn_manager.get_connection()
+            if conn is None: return None
+            
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO ventas (cliente_id, producto_id, cantidad, total) VALUES (%s, %s, %s, %s) RETURNING id",
+                (venta.cliente_id, venta.producto_id, venta.cantidad, venta.total)
+            )
+            venta_id = cursor.fetchone()[0]
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return venta_id
+        except psycopg.Error:
+            return None
+    
+    def obtener_ventas(self):
+        """Obtiene la lista de ventas."""
+        try:
+            conn = self.conn_manager.get_connection()
+            if conn is None: return []
 
-    @staticmethod
-    def crear_venta(venta: VentaModel):
-        conn = ConexionManager.obtener_conexion()
-        cur = conn.cursor()
-        cur.execute("INSERT INTO ventas (cliente_id, producto_id, cantidad) VALUES (%s, %s, %s) RETURNING id",
-                    (venta.cliente_id, venta.producto_id, venta.cantidad))
-        id = cur.fetchone()[0]
-        conn.commit()
-        cur.close()
-        conn.close()
-        return {"id": id, "cliente_id": venta.cliente_id, "producto_id": venta.producto_id, "cantidad": venta.cantidad}
+            cursor = conn.cursor()
+            cursor.execute("SELECT id, cliente_id, producto_id, cantidad, total, fecha_venta FROM ventas")
+            
+            column_names = [desc[0] for desc in cursor.description]
+            
+            ventas = []
+            for row in cursor.fetchall():
+                venta_dict = dict(zip(column_names, row))
+                if 'fecha_venta' in venta_dict and venta_dict['fecha_venta'] is not None:
+                    venta_dict['fecha_venta'] = venta_dict['fecha_venta'].isoformat()
+                ventas.append(venta_dict)
+                
+            cursor.close()
+            conn.close()
+            return ventas
+        except psycopg.Error:
+            return []
+    
+    def actualizar_venta(self, venta_id: int, venta: Venta):
+        """Actualiza una venta existente."""
+        try:
+            conn = self.conn_manager.get_connection()
+            if conn is None: return False
+            
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE ventas SET cliente_id = %s, producto_id = %s, cantidad = %s, total = %s WHERE id = %s",
+                (venta.cliente_id, venta.producto_id, venta.cantidad, venta.total, venta_id)
+            )
+            updated_rows = cursor.rowcount
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return updated_rows > 0
+        except psycopg.Error:
+            return False
 
+    def eliminar_venta(self, venta_id: int):
+        """Elimina una venta."""
+        try:
+            conn = self.conn_manager.get_connection()
+            if conn is None: return False
+            
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM ventas WHERE id = %s", (venta_id,))
+            deleted_rows = cursor.rowcount
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return deleted_rows > 0
+        except psycopg.Error:
+            return False
