@@ -1,25 +1,79 @@
+import psycopg
 from managers.conexionManager import ConexionManager
-from models.clienteModel import ClienteModel
+from models.clienteModel import Cliente 
 
 class ClientesManager:
-    @staticmethod
-    def listar_clientes():
-        conn = ConexionManager.obtener_conexion()
-        cur = conn.cursor()
-        cur.execute("SELECT id, nombre, correo FROM clientes")
-        rows = cur.fetchall()
-        cur.close()
-        conn.close()
-        return [{"id": r[0], "nombre": r[1], "correo": r[2]} for r in rows]
+    def __init__(self):
+        self.conn_manager = ConexionManager()
+    
+    def crear_cliente(self, cliente: Cliente):
+        """Crea un nuevo cliente."""
+        try:
+            conn = self.conn_manager.get_connection()
+            if conn is None: return None
+            
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO clientes (nombre, email, telefono) VALUES (%s, %s, %s) RETURNING id",
+                (cliente.nombre, cliente.email, cliente.telefono)
+            )
+            cliente_id = cursor.fetchone()[0]
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return cliente_id
+        except psycopg.Error:
+            return None
+    
+    def obtener_clientes(self):
+        """Obtiene la lista de clientes."""
+        try:
+            conn = self.conn_manager.get_connection()
+            if conn is None: return []
 
-    @staticmethod
-    def crear_cliente(cliente: ClienteModel):
-        conn = ConexionManager.obtener_conexion()
-        cur = conn.cursor()
-        cur.execute("INSERT INTO clientes (nombre, correo) VALUES (%s, %s) RETURNING id",
-                    (cliente.nombre, cliente.correo))
-        id = cur.fetchone()[0]
-        conn.commit()
-        cur.close()
-        conn.close()
-        return {"id": id, "nombre": cliente.nombre, "correo": cliente.correo}
+            cursor = conn.cursor()
+            cursor.execute("SELECT id, nombre, email, telefono FROM clientes")
+            
+            column_names = [desc[0] for desc in cursor.description]
+            clientes = [dict(zip(column_names, row)) for row in cursor.fetchall()]
+                
+            cursor.close()
+            conn.close()
+            return clientes
+        except psycopg.Error:
+            return []
+    
+    def actualizar_cliente(self, cliente_id: int, cliente: Cliente):
+        """Actualiza un cliente existente."""
+        try:
+            conn = self.conn_manager.get_connection()
+            if conn is None: return False
+            
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE clientes SET nombre = %s, email = %s, telefono = %s WHERE id = %s",
+                (cliente.nombre, cliente.email, cliente.telefono, cliente_id)
+            )
+            updated_rows = cursor.rowcount
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return updated_rows > 0
+        except psycopg.Error:
+            return False
+    
+    def eliminar_cliente(self, cliente_id: int):
+        """Elimina un cliente."""
+        try:
+            conn = self.conn_manager.get_connection()
+            if conn is None: return False
+            
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM clientes WHERE id = %s", (cliente_id,))
+            deleted_rows = cursor.rowcount
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return deleted_rows > 0
+        except psycopg.Error:
+            return False
