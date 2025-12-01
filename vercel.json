@@ -6,11 +6,13 @@ vercel.json {
     } 
   ],
   "routes": [ 
-    { "src": "/(.*)",
+    {
+      "src": "/(.*)",
       "dest": "main.py" 
     } 
-  ] 
+  ]
 }
+
 
 
 
