@@ -1,73 +1,24 @@
-import psycopg2
 from managers.conexionManager import ConexionManager
-from models.marcaModel import Marca 
+from models.marcaModel import MarcaModel
 
 class MarcasManager:
-    def __init__(self):
-        self.conn_manager = ConexionManager()
-    
-    def crear_marca(self, marca: Marca):
-        try:
-            conn = self.conn_manager.get_connection()
-            if conn is None:
-                return None
-            with conn.cursor() as cursor:
-                cursor.execute(
-                    "INSERT INTO marcas (nombre, pais) VALUES (%s, %s) RETURNING id",
-                    (marca.nombre, marca.pais)
-                )
-                marca_id = cursor.fetchone()[0]
-                conn.commit()
-            conn.close()
-            return marca_id
-        except psycopg2.Error as e:
-            print("Error en crear_marca:", e)
-            return None
-    
-    def obtener_marcas(self):
-        try:
-            conn = self.conn_manager.get_connection()
-            if conn is None:
-                return []
-            with conn.cursor() as cursor:
-                cursor.execute("SELECT id, nombre, pais FROM marcas")
-                column_names = [desc[0] for desc in cursor.description]
-                marcas = [dict(zip(column_names, row)) for row in cursor.fetchall()]
-            conn.close()
-            return marcas
-        except psycopg2.Error as e:
-            print("Error en obtener_marcas:", e)
-            return []
-    
-    def actualizar_marca(self, marca_id: int, marca: Marca):
-        try:
-            conn = self.conn_manager.get_connection()
-            if conn is None:
-                return False
-            with conn.cursor() as cursor:
-                cursor.execute(
-                    "UPDATE marcas SET nombre = %s, pais = %s WHERE id = %s",
-                    (marca.nombre, marca.pais, marca_id)
-                )
-                updated_rows = cursor.rowcount
-                conn.commit()
-            conn.close()
-            return updated_rows > 0
-        except psycopg2.Error as e:
-            print("Error en actualizar_marca:", e)
-            return False
-    
-    def eliminar_marca(self, marca_id: int):
-        try:
-            conn = self.conn_manager.get_connection()
-            if conn is None:
-                return False
-            with conn.cursor() as cursor:
-                cursor.execute("DELETE FROM marcas WHERE id = %s", (marca_id,))
-                deleted_rows = cursor.rowcount
-                conn.commit()
-            conn.close()
-            return deleted_rows > 0
-        except psycopg2.Error as e:
-            print("Error en eliminar_marca:", e)
-            return False
+    @staticmethod
+    def listar_marcas():
+        conn = ConexionManager.obtener_conexion()
+        cur = conn.cursor()
+        cur.execute("SELECT id, nombre FROM marcas")
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+        return [{"id": r[0], "nombre": r[1]} for r in rows]
+
+    @staticmethod
+    def crear_marca(marca: MarcaModel):
+        conn = ConexionManager.obtener_conexion()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO marcas (nombre) VALUES (%s) RETURNING id", (marca.nombre,))
+        id = cur.fetchone()[0]
+        conn.commit()
+        cur.close()
+        conn.close()
+        return {"id": id, "nombre": marca.nombre}
