@@ -15,8 +15,8 @@ def crear_producto(producto: Producto):
     try:
         producto_id = manager.crear_producto(producto)
         if producto_id is None:
-             # Error interno si la creación falla
-             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Fallo de conexión o error al crear producto.")
+            # Error interno si la creación falla
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Fallo de conexión o error al crear producto.")
         return {"id": producto_id, "mensaje": "Producto creado exitosamente"}
     except Exception as e:
         # Errores de entrada/validación
@@ -24,7 +24,7 @@ def crear_producto(producto: Producto):
 
 @router.get("/")
 def obtener_productos():
-    """Obtiene la lista completa de producttos."""
+    """Obtiene la lista completa de productos."""
     # Retorna el listado de productos desde el manager.
     try:
         productos = manager.obtener_productos()
@@ -58,4 +58,3 @@ def eliminar_producto(producto_id: int):
     except Exception as e:
         # Error del servidor
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al eliminar producto: {e}")
-
