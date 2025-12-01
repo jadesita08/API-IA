@@ -15,8 +15,8 @@ def crear_marca(marca: Marca):
     try:
         marca_id = manager.crear_marca(marca)
         if marca_id is None:
-             # Manejo de error interno si no se pudo crear
-             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error de conexión o fallo al crear marca.")
+            # Manejo de error interno si no se pudo crear
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error de conexión o fallo al crear marca.")
         return {"id": marca_id, "mensaje": "Marca creada exitosamente"}
     except Exception as e:
         # Errores del lado del cliente (datos inválidos, etc.)
@@ -58,4 +58,3 @@ def eliminar_marca(marca_id: int):
     except Exception as e:
         # Error del servidor
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al eliminar marca: {e}")
-
