@@ -17,8 +17,8 @@ def crear_cliente(cliente: Cliente):
     try:
         cliente_id = manager.crear_cliente(cliente)  # Intenta insertar en DB y devuelve el ID creado
         if cliente_id is None:
-             # Si no hay ID, se asume un fallo de conexión o error al crear
-             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Fallo de conexión o error al crear cliente.")
+            # Si no hay ID, se asume un fallo de conexión o error al crear
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Fallo de conexión o error al crear cliente.")
         # Respuesta estándar con el ID y un mensaje
         return {"id": cliente_id, "mensaje": "Cliente creado exitosamente"}
     except Exception as e:
@@ -61,4 +61,3 @@ def eliminar_cliente(cliente_id: int):
     except Exception as e:
         # Errores del servidor
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al eliminar cliente: {e}")
-
