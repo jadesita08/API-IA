@@ -15,8 +15,8 @@ def crear_venta(venta: Venta):
     try:
         venta_id = manager.crear_venta(venta)
         if venta_id is None:
-             # Error interno en caso de fallo al crear
-             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Fallo de conexión o error al crear venta.")
+            # Error interno en caso de fallo al crear
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Fallo de conexión o error al crear venta.")
         return {"id": venta_id, "mensaje": "Venta creada exitosamente"}
     except Exception as e:
         # Errores de entrada/validación
@@ -58,4 +58,3 @@ def eliminar_venta(venta_id: int):
     except Exception as e:
         # Error del servidor
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al eliminar venta: {e}")
-
