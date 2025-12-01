@@ -1,8 +1,6 @@
-from pydantic import BaseModel  # Importa BaseModel de Pydantic para validar datos
+from pydantic import BaseModel
 
-class Cliente(BaseModel):
-    # Esquema de la entidad Cliente.
-    # FastAPI usará este modelo para validar requests/responses.
-    nombre: str    # Nombre del cliente
-    email: str     # Email del cliente
-    telefono: str  # Teléfono de contacto del cliente
+class ClienteModel(BaseModel):
+    id: int | None = None
+    nombre: str
+    correo: str
