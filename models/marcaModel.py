@@ -1,7 +1,5 @@
-from pydantic import BaseModel  # Importa BaseModel para crear modelos de datos
+from pydantic import BaseModel
 
-class Marca(BaseModel):
-    # Esquema de la entidad Marca.
-    # Útil para validar y documentar la API en FastAPI.
-    nombre: str  # Nombre de la marca
-    pais: str    # País de origen de la marca
+class MarcaModel(BaseModel):
+    id: int | None = None
+    nombre: str
