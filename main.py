@@ -22,4 +22,3 @@ app.include_router(marcaRouter, prefix="/marcas", tags=["Marcas"])
 def read_root():
     # Endpoint raíz para verificar que el servicio está corriendo
     return {"mensaje": "Bienvenido a la API de Maquillaje"}
-
