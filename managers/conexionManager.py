@@ -5,15 +5,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class ConexionManager:
-    def __init__(self):
-        # Obtiene la URL de conexión desde .env
-        self.db_url = os.getenv('URLDATABASE')
-        
-    def get_connection(self):
-        """Establece la conexión a PostgreSQL. Lanza error si falla."""
-        try:
-            conn = psycopg2.connect(self.db_url)
-            return conn
-        except psycopg2.Error as e:
-            print("Error de conexión a la base de datos:", e)
-            return None
+    @staticmethod
+    def obtener_conexion():
+        url = os.getenv("URLDATABASE")
+        if not url:
+            raise Exception("No se encontró la variable de entorno URLDATABASE")
+        return psycopg2.connect(url)
